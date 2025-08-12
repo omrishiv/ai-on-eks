@@ -78,6 +78,15 @@ resource "kubectl_manifest" "nvidia_dcgm_exporter" {
   ]
 }
 
+resource "kubectl_manifest" "hami"{
+  count = !var.enable_hami_scheduler ? 1 : 0
+  yaml_body = file("${path.module}/argocd-addons/hami.yaml")
+
+  depends_on = [
+    module.eks_blueprints_addons
+  ]
+}
+
 # Cert Manager
 resource "kubectl_manifest" "cert_manager_yaml" {
   count     = var.enable_cert_manager || var.enable_slurm_operator ? 1 : 0

@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hami
+  namespace: argocd
+spec:
+  project: default
+  source:
+    path: charts/hami
+    repoURL: https://github.com/Project-HAMi/HAMi.git
+    targetRevision: 2ccf4129f0568bddbccf7f5ae7fc31a981efa660 # TODO: Update revision when published
+    helm:
+      values: |
+        imageTag: "2ccf412" # TODO: Update revision when published
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated: {}

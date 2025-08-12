@@ -299,6 +299,12 @@ variable "enable_nvidia_dcgm_exporter" {
   default     = true
 }
 
+variable "enable_hami_scheduler" {
+  description = "Enable HAMi scheduler"
+  type        = bool
+  default     = false
+}
+
 # Cert Manager
 variable "enable_cert_manager" {
   description = "Enable cert-manager addon"
