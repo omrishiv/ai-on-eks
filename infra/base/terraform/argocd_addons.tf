@@ -79,7 +79,7 @@ resource "kubectl_manifest" "nvidia_dcgm_exporter" {
 }
 
 resource "kubectl_manifest" "hami"{
-  count = !var.enable_hami_scheduler ? 1 : 0
+  count = var.enable_hami_scheduler ? 1 : 0
   yaml_body = file("${path.module}/argocd-addons/hami.yaml")
 
   depends_on = [
