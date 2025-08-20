@@ -53,7 +53,7 @@ flowchart RL
         AZ3
         AZ4
     end
-    subgraph instance["g5.2xlarge"]
+    subgraph instance["g6.2xlarge"]
         vllm
     end
     subgraph vllm["vLLM"]
@@ -85,7 +85,7 @@ environment and supports [many models](https://docs.vllm.ai/en/latest/models/sup
 [multiple accelerators](https://docs.vllm.ai/en/latest/features/quantization/supported_hardware.html), making it a great
 way to quickly deploy your first model.
 
-Instance Type: g5.2xlarge. The `g5.2xlarge` instance has an Nvidia A10G accelerator with 24 GiB of video memory. The
+Instance Type: g6.2xlarge. The `g6.2xlarge` instance has an Nvidia A10G accelerator with 24 GiB of video memory. The
 instance has 8 vCPUs and 32 GiB of RAM. For the most current pricing, please
 see [here](https://aws.amazon.com/ec2/pricing/on-demand/).
 
@@ -113,7 +113,7 @@ Memory=\frac{(1B * 4Bytes)}{(32/16)} * 1.2\\\
 Memory=~2.4 GiB
 $$
 
-The `g5.2xlarge` has 24 GiB of video memory, which is more than 2.4 GiB, so the model will fit with room to spare.
+The `g6.2xlarge` has 24 GiB of video memory, which is more than 2.4 GiB, so the model will fit with room to spare.
 
 ## Deployment
 
@@ -145,38 +145,66 @@ You will want to make sure your container is running with:
 
 ```bash
 kubectl get po
+
+NAME                                READY   STATUS              RESTARTS   AGE
+llama-32-1b-vllm-5ffdcdddcf-gzwnn   0/1     Running             0          2m
 ```
 
-Which should show a running vLLM container. Then, you can port-forward the vLLM port:
+Once the container is running, you can get the logs on it with
 
 ```bash
-kubectl port-forward ...
+kubectl logs -l app.kubernetes.io/component=llama-32-1b-vllm -f
 ```
 
-Finally, you can send your request to the model:
+You will see some output, when you see
+```
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+```
+the server is running. Press `ctrl + c` to stop following the logs.
+
+You can now port-forward the endpoint to your local computer:
+
+```bash
+kubectl port-forward svc/llama-32-1b-vllm 8000
+```
+
+In another terminal window, you can now send a request to the model:
 
 ```bash
 curl --location 'http://localhost:8000/v1/completions' \
 --header 'Content-Type: application/json' \
 --data '{
-    "model": "llama-32-1b",
-    "messages": [
-      {
-        "role": "developer",
-        "content": "You are a helpful assistant."
-      },
-      {
-        "role": "user",
-        "content": "What is generative AI?"
-      }
-    ]
-  }'
+    "model": "NousResearch/Llama-3.2-1B",
+    "prompt": "Once upon a time, there was a programmer."
+}'
 ```
 
 And you should get a response back:
 
 ```bash
-
+{
+    "id": "cmpl-ce19e1491f0f4d2ea35ad5d03397e168",
+    "object": "text_completion",
+    "created": 1755663702,
+    "model": "NousResearch/Llama-3.2-1B",
+    "choices": [
+        {
+            "index": 0,
+            "text": " That programmer dreamed of creating a program that could do awesome things: analyse data,",
+            "logprobs": null,
+            "finish_reason": "length",
+            "stop_reason": null,
+            "prompt_logprobs": null
+        }
+    ],
+    "usage": {
+        "prompt_tokens": 11,
+        "total_tokens": 27,
+        "completion_tokens": 16,
+        "prompt_tokens_details": null
+    },
+    "kv_transfer_params": null
+}
 ```
 
 ### Cleanup
@@ -204,7 +232,7 @@ Congratulations! You've deployed your first LLM on EKS. From here, you may want 
 - You may want to test the model on a representative dataset to get a baseline accuracy and performance for the model.
   Take a look at [model testing](.)
 - If you are happy with the output of the model, but want to try and optimize its performance more, move on
-    to [model optimization](.)
+  to [model optimization](.)
 - If the model you'd like to use is bigger than the total GPU memory on the node, you'll want to look
   at [multi-node distributed inference](.)
 - If you like the quality of the model and the performance, but are looking for a more robust deployment when more
