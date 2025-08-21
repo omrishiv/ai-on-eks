@@ -76,7 +76,7 @@ flowchart RL
 
 ### Architecture Decisions
 
-Model: [Llama 3.2-1B](https://huggingface.co/meta-llama/Llama-3.2-1B). Llama 3.2 1B is a very small open weights model.
+Model: [Llama 3.2-1B](https://huggingface.co/NousResearch/Llama-3.2-1B). Llama 3.2 1B is a very small open weights model.
 It supports text generation and is a capable first model for illustrating LLM capabilities.
 
 Inference Engine: [vLLM](https://github.com/vllm-project/vllm). vLLM is a popular, open source, inference engine that is
@@ -104,7 +104,7 @@ $$
 
 https://blog.eleuther.ai/transformer-math/
 
-Let's take the Llama 3.2-1B example ([bf16](https://huggingface.co/meta-llama/Llama-3.2-1B/blob/main/config.json#L31)):
+Let's take the Llama 3.2-1B example ([bf16](https://huggingface.co/NousResearch/Llama-3.2-1B/blob/main/config.json#L31)):
 $$
 Memory=\frac{(Parameters * 4Bytes)}{(32/Modelbits)} * 1.2\\\
 \\\
