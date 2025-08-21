@@ -158,7 +158,9 @@ kubectl logs -l app.kubernetes.io/component=llama-32-1b-vllm -f
 
 You will see some output, when you see
 ```
-INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started server process [7]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
 ```
 the server is running. Press `ctrl + c` to stop following the logs.
 
