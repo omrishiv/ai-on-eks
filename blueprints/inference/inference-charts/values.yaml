@@ -53,7 +53,7 @@ inference:
   accelerator: gpu
 
   # Framework type: vllm, ray-vllm, triton-vllm, aibrix, or lws-vllm
-  framework: vllm
+  framework:
 
   #Ray Specific Options
   rayOptions:
@@ -127,6 +127,13 @@ inference:
               labelSelector:
                 matchLabels: {} # Will be populated with deployment labels
     env: {}
+
+testing:
+  framework:
+  parameters:
+    rateType:
+    maxSeconds:
+    data:
 
 
 # Service configuration

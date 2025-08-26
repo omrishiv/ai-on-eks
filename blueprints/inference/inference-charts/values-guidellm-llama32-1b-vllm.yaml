@@ -1,0 +1,10 @@
+testing:
+  framework: guidellm
+  parameters:
+    rateType: sweep
+    maxSeconds: 30
+    data: "prompt_tokens=256,output_tokens=128"
+
+inference:
+  serviceName: llama-32-1b-vllm
+  serviceNamespace: default
