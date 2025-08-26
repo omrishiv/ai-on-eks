@@ -98,3 +98,29 @@ resource "kubectl_manifest" "slurm_operator_yaml" {
     kubectl_manifest.cert_manager_yaml
   ]
 }
+
+# Langfuse
+resource "kubectl_manifest" "langfuse_yaml" {
+  count     = var.enable_langfuse ? 1 : 0
+  yaml_body = file("${path.module}/argocd-addons/observability/langfuse/langfuse.yaml")
+
+  depends_on = [
+    module.eks_blueprints_addons,
+    kubectl_manifest.cert_manager_yaml
+  ]
+}
+
+# Gitlab
+resource "kubectl_manifest" "gitlab_yaml" {
+  count     = var.enable_gitlab ? 1 : 0
+  yaml_body = templatefile("${path.module}/argocd-addons/devops/gitlab/gitlab.yaml", {
+    proxy-real-ip-cidr = local.vpc_cidr
+    acm_certificate_arn = data.aws_acm_certificate.issued[0].arn
+    domain              = var.acm_certificate_domain
+  })
+
+  depends_on = [
+    module.eks_blueprints_addons,
+    kubectl_manifest.cert_manager_yaml
+  ]
+}

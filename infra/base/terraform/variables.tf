@@ -313,6 +313,20 @@ variable "enable_slurm_operator" {
   default     = false
 }
 
+# Langfuse
+variable "enable_langfuse" {
+  description = "Enable langfuse addon"
+  type        = bool
+  default     = false
+}
+
+# Gitlab
+variable "enable_gitlab" {
+  description = "Enable gitlab addon"
+  type        = bool
+  default     = false
+}
+
 # Jupyterhub Specific Variables
 
 # NOTE: You need to use private domain or public domain name with ACM certificate
