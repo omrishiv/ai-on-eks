@@ -17,6 +17,4 @@ spec:
           value: "{{- .Values.testing.parameters.maxSeconds }}"
         - name: GUIDELLM_DATA
           value: "{{- .Values.testing.parameters.data }}"
-        - name: GUIDELLM_OUTPUT_PATH
-          value: "results.html"
 {{- end }}
