@@ -27,13 +27,16 @@ scenarios. When testing a model, there are a few objectives:
 
 Some parameters that can be tweaked to improve SLOs:
 
-- Instance Size/GPU Type
 - Model Size
 - Context Length
 - Max number of batched tokens
 - Max number of sequences
 - Block Size
 - Chunked Prefill
+
+Some other items that can potentially improve SLOs:
+- Updated libraries
+- Instance Size/GPU Type
 
 Some SLOs to look for:
 
