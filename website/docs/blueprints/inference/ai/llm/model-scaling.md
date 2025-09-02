@@ -13,7 +13,7 @@ about both Node and Pod autoscaling and how to ensure our service keeps up with 
 # Node Autoscaling
 
 Node autoscaling ensures we do not run more compute than is necessary for our requirements. Node autoscaling is a bit
-easier to understand as it is handled entirely by [Karpenter](#). Karpenter is available as part of
+easier to understand as it is handled entirely by [Karpenter](https://karpenter.sh/). Karpenter is available as part of
 the [inference ready cluster](#), but it can also be deployed in other clusters following the instructions. Karpenter
 will watch for Kubernetes pods that are not scheduled and will request a new node from AWS that will fulfill the
 requests needed. Karpenter does this in a cost-efficient manner as it will look for the most cost-effective node to
@@ -104,7 +104,7 @@ your configuration with representative loads to ensure the autoscaling is set co
 ## Replica vs Pod vs Node Autoscaling
 
 Ray provides a bit of flexibility it when it comes to configuring the environment, especially regarding autoscaling. It
-is imperative to understande how Ray autoscaling works in a Kubernetes environment. At its core, we're interested in
+is imperative to understand how Ray autoscaling works in a Kubernetes environment. At its core, we're interested in
 scaling up our models as quickly as possible to react to a spike in requests. To create a net-new model replica, we need
 to download and start a container, download model weights, and load them into memory. With larger LLMs, this process can
 take quite a bit of time. The container alone can be 6+ GB and weights can easily top 20 GBs. Just downloading all the
