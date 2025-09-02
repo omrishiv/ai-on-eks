@@ -17,4 +17,6 @@ spec:
           value: "{{- .Values.testing.parameters.maxSeconds }}"
         - name: GUIDELLM_DATA
           value: "{{- .Values.testing.parameters.data }}"
+        - name: GUIDELLM__OPENAI__MAX_OUTPUT_TOKENS
+          value: "{{- .Values.testing.parameters.maxOutputTokens}}"
 {{- end }}

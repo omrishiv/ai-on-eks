@@ -134,6 +134,7 @@ testing:
     rateType:
     maxSeconds:
     data:
+    maxOutputTokens: 16 # Aligns GuideLLM with vLLM Sampling defaults
 
 
 # Service configuration
