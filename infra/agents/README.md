@@ -47,20 +47,3 @@ This will take 15 minutes or so.
 
 Run `./langfuse-secret.sh` to generate a langfuse secret that will be used for the deployment. The script will randomize
 values for each of the necessary keys needed for the secret.
-
-## Create Gitlab Records
-
-We will create 2 A records aliased to the Network Load Balancer that was created as part of the deployment.
-
-Record Names:
-
-- registry.subdomain.tld
-- gitlab.subdomain.tld
-
-Record Type: A
-Alias
-Endpoint: Alias to Network Load Balancer
-Region: us-west-2
-Load Balancer Name: k8s-gitlab-gitlabng-...
-
-At this point, Gitlab should be available at `https://gitlab.subdomain.tld`

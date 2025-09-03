@@ -6,57 +6,54 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
+  destination:
+    namespace: gitlab
+    server: https://kubernetes.default.svc
   project: default
   source:
     chart: gitlab
-    repoURL: https://charts.gitlab.io/
-    targetRevision: "9.1.1"
     helm:
       values: |
         installCertmanager: false
+        gitlab:
+          ingress:
+            className: nginx
+            tls:
+              enabled: false
+          kas:
+            ingress:
+              enabled: false
         global:
           edition: ce
           hosts:
             domain: ${domain}
           ingress:
             configureCertmanager: false
-          tls:
-            enabled: false
+            class: nginx
+            tls:
+              enabled: false
         ingress:
           enabled: false
+          class:
+            name: nginx
           configureCertmanager: false
           tls:
             enabled: false
         certmanager-issuer:
           email: $EMAIL
-        nginx-ingress:
-          controller:
+        minio:
+          ingress:
             enabled: false
-            service:
-              targetPorts:
-                https: http
-              annotations:
-                service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
-                service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
-                service.beta.kubernetes.io/aws-load-balancer-type: "nlb-ip"
-                service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
-                service.beta.kubernetes.io/aws-load-balancer-ssl-ports: https
-                service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: 3600
-                service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "${acm_certificate_arn}"
-                service.beta.kubernetes.io/load-balancer-source-ranges: "0.0.0.0/0"
-            config:
-              use-http2: "true"
-              proxy-real-ip-cidr: ${proxy-real-ip-cidr}
-              use-proxy-protocol: "true"
+        nginx-ingress:
+          enabled: false
         upgradeCheck:
           enabled: false
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: gitlab
+    repoURL: https://charts.gitlab.io/
+    targetRevision: 9.1.1
   syncPolicy:
-    syncOptions:
-      - ServerSideApply=true
-      - CreateNamespace=true
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+      - CreateNamespace=true

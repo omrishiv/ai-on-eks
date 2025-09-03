@@ -129,6 +129,11 @@ variable "enable_kube_prometheus_stack" {
   type        = bool
   default     = false
 }
+variable "enable_external_dns" {
+  description = "Enable External DNS"
+  type        = bool
+  default     = false
+}
 variable "enable_kubecost" {
   description = "Enable Kubecost addon"
   type        = bool

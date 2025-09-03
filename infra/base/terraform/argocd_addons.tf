@@ -106,7 +106,6 @@ resource "kubectl_manifest" "langfuse_yaml" {
 
   depends_on = [
     module.eks_blueprints_addons,
-    kubectl_manifest.cert_manager_yaml
   ]
 }
 
@@ -121,6 +120,5 @@ resource "kubectl_manifest" "gitlab_yaml" {
 
   depends_on = [
     module.eks_blueprints_addons,
-    kubectl_manifest.cert_manager_yaml
   ]
 }
