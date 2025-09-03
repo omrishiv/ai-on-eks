@@ -21,9 +21,18 @@ already own.
 
 ### Create a Hosted Zone
 
+Follow the directions
+to [create a hosted zone](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html). If this
+will be a sudomain from another domain, name it following the pattern `subdomain.domain.tld`
+
 #### (Optional) Add Hosted Zone as Sub Domain
 
+If you want to use a subdomain off of the domain, add the hosted zone as
+a [subdomain](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingNewSubdomain.html) to your main domain.
+
 ### Create an ACM Certificate
+
+Follow the directions to [create an ACM certificate](https://docs.aws.amazon.com/res/latest/ug/acm-certificate.html)
 
 ## Deploy the Environment
 
@@ -36,11 +45,15 @@ This will take 15 minutes or so.
 
 ## Create Langfuse Secret
 
+Run `./langfuse-secret.sh` to generate a langfuse secret that will be used for the deployment. The script will randomize
+values for each of the necessary keys needed for the secret.
+
 ## Create Gitlab Records
 
 We will create 2 A records aliased to the Network Load Balancer that was created as part of the deployment.
 
 Record Names:
+
 - registry.subdomain.tld
 - gitlab.subdomain.tld
 
