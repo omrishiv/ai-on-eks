@@ -101,7 +101,7 @@ resource "kubectl_manifest" "slurm_operator_yaml" {
 
 # Langfuse
 resource "kubectl_manifest" "langfuse_yaml" {
-  count     = var.enable_langfuse ? 1 : 0
+  count = var.enable_langfuse ? 1 : 0
   yaml_body = file("${path.module}/argocd-addons/observability/langfuse/langfuse.yaml")
 
   depends_on = [
@@ -109,11 +109,37 @@ resource "kubectl_manifest" "langfuse_yaml" {
   ]
 }
 
+# Langfuse Secret
+# TODO: Move this
+
+resource "random_bytes" "langfuse_secret" {
+  count  = var.enable_langfuse ? 8 : 0
+  length = 32
+}
+
+resource "kubectl_manifest" "langfuse_secret_yaml" {
+  count = var.enable_langfuse ? 1 : 0
+  yaml_body = templatefile("${path.module}/argocd-addons/observability/langfuse/langfuse-secret.yaml", {
+    salt                = random_bytes.langfuse_secret[0].hex
+    encryption-key      = random_bytes.langfuse_secret[1].hex
+    nextauth-secret     = random_bytes.langfuse_secret[2].hex
+    postgresql-password = random_bytes.langfuse_secret[3].hex
+    clickhouse-password = random_bytes.langfuse_secret[4].hex
+    redis-password      = random_bytes.langfuse_secret[5].hex
+    s3-user             = random_bytes.langfuse_secret[6].hex
+    s3-password         = random_bytes.langfuse_secret[7].hex
+  })
+
+  depends_on = [
+    kubectl_manifest.langfuse_yaml
+  ]
+}
+
 # Gitlab
 resource "kubectl_manifest" "gitlab_yaml" {
-  count     = var.enable_gitlab ? 1 : 0
+  count = var.enable_gitlab ? 1 : 0
   yaml_body = templatefile("${path.module}/argocd-addons/devops/gitlab/gitlab.yaml", {
-    proxy-real-ip-cidr = local.vpc_cidr
+    proxy-real-ip-cidr  = local.vpc_cidr
     acm_certificate_arn = data.aws_acm_certificate.issued[0].arn
     domain              = var.acm_certificate_domain
   })

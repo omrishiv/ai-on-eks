@@ -42,8 +42,3 @@ Follow the directions to [create an ACM certificate](https://docs.aws.amazon.com
 - Run `./install.sh`
 
 This will take 15 minutes or so.
-
-## Create Langfuse Secret
-
-Run `./langfuse-secret.sh` to generate a langfuse secret that will be used for the deployment. The script will randomize
-values for each of the necessary keys needed for the secret.
