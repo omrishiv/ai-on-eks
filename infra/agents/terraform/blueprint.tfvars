@@ -1,8 +1,9 @@
-name                   = "aioeks-agents"
-enable_langfuse        = true
-enable_gitlab          = true
-enable_external_dns    = true
-acm_certificate_domain = "" # Update with domain
+name                    = "aioeks-agents"
+enable_langfuse         = true
+enable_gitlab           = true
+enable_external_dns     = true
+enable_external_ingress = true
+acm_certificate_domain  = "" # Update with domain
 
 # region              = "us-west-2"
 # eks_cluster_version = "1.33"

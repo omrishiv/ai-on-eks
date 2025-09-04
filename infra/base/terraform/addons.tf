@@ -5,6 +5,11 @@ data "aws_acm_certificate" "issued" {
   statuses = ["ISSUED"]
 }
 
+data "aws_route53_zone" "hosted_zone_id" {
+  count = var.acm_certificate_domain != "" ? 1 : 0
+  name  = var.acm_certificate_domain
+}
+
 locals {
   cognito_custom_domain = var.cognito_custom_domain
 }
@@ -82,13 +87,20 @@ module "eks_blueprints_addons" {
     }]
   }
 
+  enable_external_dns = var.enable_external_dns
+  external_dns_route53_zone_arns = ["arn:aws:route53:::hostedzone/${data.aws_route53_zone.hosted_zone_id.zone_id}"]
+
   #---------------------------------------
   # Ingress Nginx Add-on
   #---------------------------------------
   enable_ingress_nginx = var.enable_ingress_nginx
   ingress_nginx = {
     version = "4.12.1"
-    values  = [templatefile("${path.module}/helm-values/ingress-nginx-values.yaml", {})]
+    values = [
+      var.enable_external_ingress ? templatefile("${path.module}/helm-values/ingress-nginx-external-values.yaml", {
+        acm_certificate_arn = data.aws_acm_certificate.issued[0].arn
+      }) : templatefile("${path.module}/helm-values/ingress-nginx-values.yaml", {})
+    ]
   }
 
   #---------------------------------------
