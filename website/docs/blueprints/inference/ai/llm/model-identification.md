@@ -85,7 +85,7 @@ environment and supports [many models](https://docs.vllm.ai/en/latest/models/sup
 [multiple accelerators](https://docs.vllm.ai/en/latest/features/quantization/supported_hardware.html), making it a great
 way to quickly deploy your first model.
 
-Instance Type: g6.2xlarge. The `g6.2xlarge` instance has an Nvidia A10G accelerator with 24 GiB of video memory. The
+Instance Type: g6.2xlarge. The `g6.2xlarge` instance has an Nvidia L4 accelerator with 24 GiB of video memory. The
 instance has 8 vCPUs and 32 GiB of RAM. For the most current pricing, please
 see [here](https://aws.amazon.com/ec2/pricing/on-demand/).
 
