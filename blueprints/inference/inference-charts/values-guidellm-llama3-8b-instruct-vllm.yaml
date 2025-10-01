@@ -1,0 +1,10 @@
+testing:
+  framework: guidellm
+  parameters:
+    rateType: sweep
+    maxSeconds: 30
+    data: "databricks/databricks-dolly-15k"
+
+inference:
+  serviceName: llama-3-8b-instruct-vllm
+  serviceNamespace: default
