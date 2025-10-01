@@ -1,0 +1,12 @@
+model: NousResearch/Meta-Llama-3-8B-Instruct
+
+inference:
+  serviceName: llama-3-8b-instruct-vllm
+  serviceNamespace: default
+  accelerator: gpu
+  framework: vllm
+
+  modelServer:
+    image:
+      repository: vllm/vllm-openai
+      tag: v0.9.1
