@@ -233,12 +233,12 @@ kubectl delete service llama-32-1b-vllm
 Congratulations! You've deployed your first LLM on EKS. From here, you may want to look at a few different paths:
 
 - You may want to test the model on a representative dataset to get a baseline accuracy and performance for the model.
-  Take a look at [model testing](.)
+  Take a look at [model testing](#)
 - If you are happy with the output of the model, but want to try and optimize its performance more, move on
-  to [model optimization](.)
+  to [model optimization](#)
 - If the model you'd like to use is bigger than the total GPU memory on the node, you'll want to look
-  at [multi-node distributed inference](.)
+  at [multi-node distributed inference](#)
 - If you like the quality of the model and the performance, but are looking for a more robust deployment when more
-  traffic comes to it, you will want to look at [autoscaling](.) the model.
+  traffic comes to it, you will want to look at [autoscaling](#) the model.
 - If you are trying to squeeze the most performance out of the model regarding further optimization, take a look
-  at [model productionalization](.)
+  at [model productionalization](#)

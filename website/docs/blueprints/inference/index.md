@@ -58,19 +58,19 @@ prediction and image generation.
 
 LLMs are a type of model that is trained to understand meaning and context from human language and then generate or
 manipulate text. These types of models excel at translation, answering questions, summarizing text, or creative writing.
-To get started with these models, head over to the [LLM](./ai/llm) section.
+To get started with these models, head over to the [LLM](./ai/llm/model-identification.md) section.
 
 ### Diffusion
 
 Diffusion models are models that learn how to generate information through a process of learning that iteratively adds
 more noise/obfuscation to the data as the model gets better. These models are adept at generating images, audio, and
-video from a textual prompt. Learn more about these models in the [diffusion](./ai/diffusion) section.
+video from a textual prompt. Learn more about these models in the [diffusion](#) section.
 
 ## Getting Started
 
 ### Inference-Ready EKS Cluster
 
-The [Inference-Ready EKS Cluster](.)
+The [Inference-Ready EKS Cluster](../../infra/inference-ready-cluster.md)
 
 ### 🚀 Inference Charts
 
