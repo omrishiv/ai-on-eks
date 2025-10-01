@@ -7,7 +7,7 @@ spec:
   containers:
     - name: worker
       command: [ "/bin/sh", "-c", "guidellm benchmark run && sleep infinity" ] # Sleep infinity to allow retrieving report
-      image: ghcr.io/vllm-project/guidellm@sha256:24c9e85f807cb6936ee401e6abdb311236c55cd62ec10fc306307e9384c15f9f
+      image: ghcr.io/vllm-project/guidellm:v0.3.0
       env:
         - name: GUIDELLM_TARGET
           value: "http://{{- .Values.inference.serviceName -}}.{{- .Values.inference.serviceNamespace -}}:{{- .Values.service.port -}}"

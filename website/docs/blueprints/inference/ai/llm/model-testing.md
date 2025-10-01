@@ -97,7 +97,7 @@ kubectl cp benchmark-llama-32-1b-vllm:/results/benchmarks.json ./benchmarks.json
 ### Interpreting the Results
 
 GuideLLM has a [section](https://github.com/vllm-project/guidellm?tab=readme-ov-file#3-analyze-the-results) on analyzing
-the results and how they relate to SLOs. 
+the results and how they relate to SLOs.
 
 ### Retesting with new Parameters
 
@@ -127,9 +127,151 @@ While there are fewer possible things to tweak, comparing the model output to th
 ### Qualitative Evaluation
 
 A first step can be to send some inputs to the model and look at the output. A quick glance may highlight whether the
-model produces usable results.
+model produces usable results. In this case, an instruction tuned model may be interesting to test. Let's
+deploy [Llama 3 8B Instruction tuned](https://huggingface.co/NousResearch/Meta-Llama-3-8B-Instruct) using the inference
+charts.
 
-### Evaluation Metrics (ROUGE, BLUE)
+```bash
+cd blueprints/inference/inference-charts/
+helm template . --values values-llama-3-8b-instruct-vllm.yaml | kubectl apply -f -
+```
 
-### LLM As a Judge (context)
+Once the model is running, we can port forward and send a request
 
+```bash
+kubectl port-forward svc/llama-3-8b-instruct-vllm 8000
+
+curl --location 'http://localhost:8000/v1/completions' \
+--header 'Content-Type: application/json' \
+--data '{
+    "model": "NousResearch/Meta-Llama-3-8B-Instruct",
+    "prompt": "Alice'\''s parents have three daughters: Amy, Jessy, and what’s the name of the third daughter?"
+}'
+```
+
+```json
+{
+  "id": "cmpl-caad43aaafd545d88b248907206033de",
+  "object": "text_completion",
+  "created": 1759355785,
+  "model": "NousResearch/Meta-Llama-3-8B-Instruct",
+  "choices": [
+    {
+      "index": 0,
+      "text": " Alice!\nSo, Alice's parents have three daughters, and one of them is",
+      "logprobs": null,
+      "finish_reason": "length",
+      "stop_reason": null,
+      "prompt_logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 23,
+    "total_tokens": 39,
+    "completion_tokens": 16,
+    "prompt_tokens_details": null
+  },
+  "kv_transfer_params": null
+}
+```
+
+Sending the same prompt to a text generation model such as our previously deployed Llama 3.2-1B model would return
+something like
+
+```json
+{
+  "id": "cmpl-f2b12932ecf947c9b411e8efb200862f",
+  "object": "text_completion",
+  "created": 1759356077,
+  "model": "NousResearch/Llama-3.2-1B",
+  "choices": [
+    {
+      "index": 0,
+      "text": " And the assumed name of the first daughter is?\nFord, John and Jennifer Fran",
+      "logprobs": null,
+      "finish_reason": "length",
+      "stop_reason": null,
+      "prompt_logprobs": null
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 23,
+    "total_tokens": 39,
+    "completion_tokens": 16,
+    "prompt_tokens_details": null
+  },
+  "kv_transfer_params": null
+}
+```
+
+Not a useful response for answering the question, but maybe a good one if we were trying to generate text? Let's now
+test the quality of the model using
+the [Databricks Dolly 15K](https://huggingface.co/datasets/databricks/databricks-dolly-15k) dataset. This dataset has
+15,000 rows of instructions and their expected responses. We can use GuideLLM to test this using the `data` parameter
+set to the Hugging Face dataset id.
+
+```bash
+cd blueprints/inference/inference-charts/
+helm template . --values values-guidellm-llama3-8b-instruct-vllm.yaml | kubectl apply -f -
+```
+
+This will run a test using the Databricks dataset instead of the synthetic one we used before. Let's again get the logs
+for the benchmark:
+
+```bash
+kubectl logs benchmark-llama-3-8b-instruct-vllm
+```
+
+And the result of the benchmark off the pod:
+
+```bash
+kubectl cp benchmark-llama-3-8b-instruct-vllm:/results/benchmarks.json ./benchmarks.json
+```
+
+If we then open the `benchmarks.json` we can see all of the prompts sent to the model, the responses, and much of the
+data about the request. We set the maximum output tokens to 16 during the test to stay consistent with vLLM's default
+sampling value, so many of the responses may be incomplete, but we can compare the expectation from the dataset to what
+we received from the model. Hugging Face provides
+a [viewer](https://huggingface.co/datasets/databricks/databricks-dolly-15k/viewer) to see the dataset. If we look at the
+first row, we see the prompt " When did Virgin Australia start operating?". If we look at the `benchmarks.json`, we can
+search for this prompt. In our case:
+
+```json
+{
+  "type_": "generative_text_response",
+  "request_id": "f90f365b-16a7-4ce3-8a53-8d37c71458a3",
+  "request_type": "text_completions",
+  "scheduler_info": {
+    "requested": true,
+    "completed": true,
+    "errored": false,
+    "canceled": false,
+    "targeted_start_time": 1759354691.715061,
+    "queued_time": 1759354684.7064037,
+    "dequeued_time": 1759354690.715497,
+    "scheduled_time": 1759354690.715647,
+    "worker_start": 1759354691.7165263,
+    "request_start": 1759354691.7182198,
+    "request_end": 1759354695.648075,
+    "worker_end": 1759354695.6655831,
+    "process_id": 4
+  },
+  "prompt": "When did Virgin Australia start operating?",
+  "output": " Virgin Australia, previously known as Virgin Blue, began operating in 2000.",
+  "prompt_tokens": 8,
+  "output_tokens": 16,
+  "start_time": 1759354691.7182198,
+  "end_time": 1759354695.648075,
+  "first_token_time": 1759354692.9827628,
+  "last_token_time": 1759354695.6479197,
+  "request_latency": 3.9298553466796875,
+  "time_to_first_token_ms": 1264.543056488037,
+  "time_per_output_token_ms": 166.57230257987976,
+  "inter_token_latency_ms": 177.67712275187174,
+  "tokens_per_second": 6.107095015667043,
+  "output_tokens_per_second": 4.0713966771113625
+}
+```
+
+We can compare that to the expected result from the dataset "Virgin Australia commenced services on 31 August 2000 as
+Virgin Blue, with two aircraft on a single route." Our response is technically correct. 
