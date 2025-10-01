@@ -139,6 +139,9 @@ spec:
                       secretKeyRef:
                         key: token
                         name: hf-token
+                  # TODO: Remove this when switching to RayLLM API
+                  - name: MODEL
+                    value: "{{ .Values.model}}"
                   {{- if .Values.modelParameters }}
                   {{- range $key, $value := .Values.modelParameters }}
                   - name: {{ $key | snakecase | upper }}
@@ -254,14 +257,16 @@ spec:
         runtime_env:
           pip:
             - vllm=={{.Values.inference.modelServer.vllmVersion}}
+            - numpy==1.26.4
+            - transformers<4.54.0
         {{- end }}
         deployments:
           - name: serve
             ray_actor_options:
               {{- if eq .Values.inference.accelerator "gpu" }}
-              num_gpus: {{ .Values.modelParameters.numGpus }}
+              num_gpus: {{ index .Values.inference.modelServer.deployment.resources.gpu.requests "nvidia.com/gpu" }}
               {{- else }}
-              resources: {"neuron_cores": {{ mul .Values.modelParameters.numGpus 2 }}}
+              resources: {"neuron_cores": {{ index .Values.inference.modelServer.deployment.resources.neuron.requests "aws.amazon.com/neuron" | mul  2 }}}
               {{- end }}
             num_replicas: {{ .Values.inference.rayOptions.autoscaling.actorAutoscaling.minActors }}
             max_replicas_per_node: {{ .Values.inference.rayOptions.autoscaling.actorAutoscaling.maxActors }}

@@ -25,6 +25,15 @@ resource "kubectl_manifest" "aibrix_core_yaml" {
   ]
 }
 
+resource "kubectl_manifest" "lws_yaml" {
+  count     = var.enable_leader_worker_set ? 1 : 0
+  yaml_body = file("${path.module}/argocd-addons/leader-worker-set.yaml")
+
+  depends_on = [
+    module.eks_blueprints_addons
+  ]
+}
+
 resource "kubectl_manifest" "nvidia_nim_yaml" {
   count     = var.enable_nvidia_nim_stack ? 1 : 0
   yaml_body = file("${path.module}/argocd-addons/nvidia-nim-operator.yaml")
@@ -92,6 +101,17 @@ resource "kubectl_manifest" "cert_manager_yaml" {
 resource "kubectl_manifest" "slurm_operator_yaml" {
   count     = var.enable_slurm_operator ? 1 : 0
   yaml_body = file("${path.module}/argocd-addons/slurm-operator.yaml")
+
+  depends_on = [
+    module.eks_blueprints_addons,
+    kubectl_manifest.cert_manager_yaml
+  ]
+}
+
+# MPI Operator
+resource "kubectl_manifest" "mpi_operator" {
+  count     = var.enable_mpi_operator ? 1 : 0
+  yaml_body = file("${path.module}/argocd-addons/mpi-operator.yaml")
 
   depends_on = [
     module.eks_blueprints_addons,
