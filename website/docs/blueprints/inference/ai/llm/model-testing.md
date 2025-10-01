@@ -35,6 +35,7 @@ Some parameters that can be tweaked to improve SLOs:
 - Chunked Prefill
 
 Some other items that can potentially improve SLOs:
+
 - Updated libraries
 - Instance Size/GPU Type
 
@@ -64,21 +65,39 @@ Testing Parameters:
 ```
 
 A good first step is to benchmark the default inference server arguments. This is very simple to do using
-the [inference-charts]()
+the [inference-charts](../../inference-charts.md).
+
+### Deploy GuideLLM Test
+
+From the inference charts, we can use the `values-guidellm-llama32-1b-vllm.yaml` to create the pod template and apply it
+
+```bash
+cd blueprints/inference/inference-charts/
+helm template . --values values-guidellm-llama32-1b-vllm.yaml | kubectl apply -f -
+```
+
+This will create a pod called `benchmark-llama-32-1b-vllm` and start the benchmark. The benchmark will run multiple
+tests against the model endpoint using a synthetic benchmark. You can also provide your own data to make the benchmark
+more indicative of real-world performance by setting the `testing.parameters.data` field according to
+the [data documentation](https://github.com/vllm-project/guidellm/blob/main/docs/datasets.md#data-arguments-overview).
+Note: the "local" path is local to the benchmarking pod. You will need to make the path available to the pod.
 
 We can get the summary of the benchmark by looking at the logs:
 
 ```bash
-kubectl logs llama-32-1b-vllm
+kubectl logs benchmark-llama-32-1b-vllm
 ```
 
 We can also get the result of the benchmark off the pod:
 
 ```bash
-kubectl cp llama-32-1b-vllm:/results/benchmarks.json ./benchmarks.json
+kubectl cp benchmark-llama-32-1b-vllm:/results/benchmarks.json ./benchmarks.json
 ```
 
 ### Interpreting the Results
+
+GuideLLM has a [section](https://github.com/vllm-project/guidellm?tab=readme-ov-file#3-analyze-the-results) on analyzing
+the results and how they relate to SLOs. 
 
 ### Retesting with new Parameters
 
@@ -92,7 +111,7 @@ As you can see from the results, that is in fact true, but has the tradeoff of h
 we were trying to reduce the overall request length, but process as many requests, we may have to add another model
 replica and load balance between them. Further tuning of the model parameters may also offset the number of requests
 processed. It is important to optimize the model using representative data; otherwise the adjustments made may not
-reflect what happens in production. 
+reflect what happens in production.
 
 ## Evaluation
 

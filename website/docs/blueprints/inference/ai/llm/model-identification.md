@@ -10,7 +10,7 @@ the job can be daunting when getting started with LLM inference. There are a mul
 
 - Accuracy: How well does the model generate text?
 - Parameter count: The larger the model is, the more compute is required to run it
-- Latency: How long does the model take to run a request? Does it fall within your desired SLAs?
+- Latency: How long does the model take to run a request? Does it fall within your desired SLOs?
 - Licensing: Is the licensing of the model permissive to your use case?
 - Customization Capabilities: Can you fine-tune the LLM on your data?
 - Capabilities: Does the model work for the task you need?
@@ -76,7 +76,8 @@ flowchart RL
 
 ### Architecture Decisions
 
-Model: [Llama 3.2-1B](https://huggingface.co/NousResearch/Llama-3.2-1B). Llama 3.2 1B is a very small open weights model.
+Model: [Llama 3.2-1B](https://huggingface.co/NousResearch/Llama-3.2-1B). Llama 3.2 1B is a very small open weights
+model.
 It supports text generation and is a capable first model for illustrating LLM capabilities.
 
 Inference Engine: [vLLM](https://github.com/vllm-project/vllm). vLLM is a popular, open source, inference engine that is
@@ -104,7 +105,8 @@ $$
 
 https://blog.eleuther.ai/transformer-math/
 
-Let's take the Llama 3.2-1B example ([bf16](https://huggingface.co/NousResearch/Llama-3.2-1B/blob/main/config.json#L31)):
+Let's take the Llama 3.2-1B
+example ([bf16](https://huggingface.co/NousResearch/Llama-3.2-1B/blob/main/config.json#L31)):
 $$
 Memory=\frac{(Parameters * 4Bytes)}{(32/Modelbits)} * 1.2\\\
 \\\
@@ -117,14 +119,14 @@ The `g6.2xlarge` has 24 GiB of video memory, which is more than 2.4 GiB, so the 
 
 ## Deployment
 
-This deployment assumes you are using the [Inference Ready Cluster](.) solution, which supports deployments using
-multiple frameworks and accelerators.
+This deployment assumes you are using
+the [Inference Ready Cluster](https://awslabs.github.io/ai-on-eks/docs/infra/inference-ready-cluster) solution, which
+supports deployments using multiple frameworks and accelerators.
 
-### Option 1: Inference Charts (Quick Start)
+### Inference Charts
 
-This architecture is available in the AI on EKS [inference charts](../../inference-charts.md). From the root of the AI
-on EKS deployment. Before deploying the chart, you will need to create a Hugging Face token and add it to your
-environment. You can follow the instructions
+This architecture is available in the AI on EKS [inference charts](../../inference-charts.md). Before deploying the
+chart, you will need to create a Hugging Face token and add it to your environment. You can follow the instructions
 at  [inference charts](../../inference-charts.md#1-create-hugging-face-token-secret) to create your token.
 
 You will also need to make sure you request access to the [Llama 3.2-1B](https://huggingface.co/meta-llama/Llama-3.2-1B)
@@ -136,8 +138,6 @@ helm template . --values values-llama-32-1b-vllm.yaml | kubectl apply -f -
 ```
 
 This will deploy the vLLM container, which will pull the weights from Hugging Face and load the model.
-
-### Option 2: Manual Deployment
 
 ## Use the Model
 
@@ -157,11 +157,13 @@ kubectl logs -l app.kubernetes.io/component=llama-32-1b-vllm -f
 ```
 
 You will see some output, when you see
+
 ```
 INFO:     Started server process [7]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 ```
+
 the server is running. Press `ctrl + c` to stop following the logs.
 
 You can now port-forward the endpoint to your local computer:
@@ -224,7 +226,6 @@ helm template . --values values-llama-32-1b-vllm.yaml | kubectl delete -f -
 ```bash
 kubectl delete deployment llama-32-1b-vllm
 kubectl delete service llama-32-1b-vllm
-kubectl delete configmap vllm-serve
 ```
 
 ### Summary and Next Steps

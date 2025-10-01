@@ -68,9 +68,9 @@ video from a textual prompt. Learn more about these models in the [diffusion](./
 
 ## Getting Started
 
-### Inference Cluster
+### Inference-Ready EKS Cluster
 
-
+The [Inference-Ready EKS Cluster](.)
 
 ### 🚀 Inference Charts
 
