@@ -16,7 +16,9 @@ techniques, and where to go next. We see a common journey most customers go thro
 ```mermaid
 flowchart LR
     %% deploy model
-    step1{Model Identification and Testing}
+    step1{Model Identification}
+    %% model testing
+    modelTesting{Model Testing}
     %% deploy different model
     step2{Model Comparison}
 
@@ -24,18 +26,19 @@ flowchart LR
     step3{Model Optimization}
     %% server optimization
     step4{Server Selection}
-    %% autoscaling
-    step5{Model Scaling}
+    %% model Scaling
+    modelScaling{Model Scaling}
     %% production optimization
     step6{Model Productionalization}
 
-    step1-->step2-->step3-->step4-->step5-->step6
+    step1-->modelTesting-->step2-->step3-->step4-->modelScaling-->step6
 
-    click step1 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step1.md"
+    click step1 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-identification.md"
+    click modelTesting "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-testing.md"
     click step2 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step2.md"
     click step3 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step3.md"
     click step4 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step4.md"
-    click step5 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step5.md"
+    click modelScaling "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-scaling.md"
     click step6 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step6.md"
 ```
 

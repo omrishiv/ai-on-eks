@@ -15,10 +15,11 @@ computations can be distributed over multiple GPUs in a single node. This is cal
 configurable setting when deploying LLMs for inference.
 
 Caveat: The number of attention heads of the model need to be evenly divisible by the number of GPUs used for tensor
-parallelism. For instance, Llama 3 8B has 32 attention heads (Table 3; The Llama 3 Herd of Models). This number needs to
-be divisible by the number of GPUs used for tensor parallelism. Most instances have 1,2,4,or 8 GPUs, so this is not a
-problem, but if one GPU were to be reserved for a different use, it would not be possible to set the tensor parallelism
-value to 7 or 3.
+parallelism. For instance, Llama 3 8B has 32 attention heads (Table
+3; [The Llama 3 Herd of Models](https://ai.meta.com/research/publications/the-llama-3-herd-of-models/)). This number
+needs to be divisible by the number of GPUs used for tensor parallelism. Most instances have 1,2,4,or 8 GPUs, so this is
+not a problem, but if one GPU were to be reserved for a different use, it would not be possible to set the tensor
+parallelism value to 7 or 3.
 
 If the total available GPU memory of the instance is still not enough for the model, a combination of Tensor Parallelism
 and Pipeline Parallelism can be used to distribute both the intra-layer computation (tensor parallelism) and the layers

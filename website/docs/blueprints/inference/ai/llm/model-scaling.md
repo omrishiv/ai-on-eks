@@ -124,9 +124,39 @@ to the cluster.
 
 With this in mind, let's understand some of the optimizations we can make and their tradeoffs.
 
+### Autoscaling Tradeoffs
 
+In an ideal scenario, only resources that are currently needed are being used, and when a new model replica is needed,
+it would be made available instantly. This requires creating a new instance that has exactly the resources that are
+required, pulling the container image instantly, having the model weights already available, and minimizing the model
+load time into memory. Doing all of this instantly is not possible. Doing this as effectively as possible is addressed
+in the [cold start](#cold-start) section. While this is possible to do efficiently, we can make some tradeoffs to have
+it happen faster.
+
+Remember that Ray will only request a new ray worker (pod) if the ray cluster does not have enough resources to create a
+new model replica. Also remember that a new node will only be requested if a pod cannot be scheduled on the available
+resources. Therefore, there are a few components that can be sized: how many resources are available to each worker (#
+GPUs on the Ray worker pod) as well as how many resources are requested for each pod (the instance size for the Ray
+worker pods). We can also have extra instances running that are available for scheduling.
+
+If a model scales up in a Ray cluster that has excess resources using the same Kubernetes pod, it's possible that the
+model startup time is minimized as the container for the model is already running (the Ray pod) and the model weights
+are already downloaded into the pod cache due to a pre-existing instance of that model already running on the pod. While
+this may be a fast way to scale up Ray model replicas, it's also the most expensive as these are resources that could be
+used for other purposes or scaled down. The other option is to run very lean Ray worker pods (setting the number of
+resources to be exactly what 1 replica needs). This would minimize costs, but would increase the time for the replica to
+start. In this case, using the [cold start](#cold-start) guidance can help minimize this time. 
 
 # Challenges
 
-- Cold Start
-- Resource Skew
+## Cold Start
+
+Cold start refers to the amount of time from when a new pod is requested to when it is ready to fulfill requests. The
+challenge comes from two different components: pulling the container and pulling the model weights. AI on EKS has a
+section specifically devoted to addressing [cold start challenges](../../../../guidance/container-startup-time).
+
+## Model Aware Load Balancing
+
+As LLM output token lengths are somewhat stochastically unless explicitly set, traditional load balancing of
+round-robin requests is less effective. AI on EKS addresses this challenge in the [model productionalization](#)
+section, but it is good to be aware of it now.
