@@ -16,30 +16,27 @@ techniques, and where to go next. We see a common journey most customers go thro
 ```mermaid
 flowchart LR
     %% deploy model
-    step1{Model Identification}
+    modelDeployment{Model Deployment}
     %% model testing
     modelTesting{Model Testing}
-    %% deploy different model
-    step2{Model Comparison}
-
     %% model config optimization
     step3{Model Optimization}
-    %% server optimization
-    step4{Server Selection}
     %% model Scaling
     modelScaling{Model Scaling}
     %% production optimization
     step6{Model Productionalization}
+    multinodeDistributedInference{Multinode Distributed Inference}
 
-    step1-->modelTesting-->step2-->step3-->step4-->modelScaling-->step6
+  modelDeployment-->modelTesting-->step3-->modelScaling-->step6
+  modelDeployment-->multinodeDistributedInference
+  multinodeDistributedInference-->modelTesting
 
-    click step1 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-identification.md"
+    click modelDeployment "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-identification.md"
     click modelTesting "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-testing.md"
-    click step2 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step2.md"
     click step3 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step3.md"
-    click step4 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step4.md"
     click modelScaling "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-scaling.md"
     click step6 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step6.md"
+    click multinodeDistributedInference "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/multinode-distributed-inference.md"
 ```
 
 Inference on EKS is split into the following sections: ML inference and AI inference. Navigating the complexity of different use cases, model types, inference engine, framework, and accelerator can be

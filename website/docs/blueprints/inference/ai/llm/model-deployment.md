@@ -1,8 +1,8 @@
 ---
-sidebar_label: Model Identification
+sidebar_label: Model Deployment
 ---
 
-# Model Identification
+# Model Deployment
 
 There are over 250,000 Text Generation models
 on [Hugging Face](https://huggingface.co/models?pipeline_tag=text-generation&sort=trending). Finding the right model for
@@ -210,6 +210,11 @@ And you should get a response back:
     "kv_transfer_params": null
 }
 ```
+
+> **Note:** You may have noticed the `/v1/completions` endpoint and are wondering when to use `/v1/completions` or
+`/v1/chat/completions`. This space is constantly evolving and a great resource for knowing which endpoint to use for a
+> given model is Hugging Face. Under the "Use this model" button for the model card is a "vLLM" option which will show
+> you the correct endpoint.
 
 ### Cleanup
 
