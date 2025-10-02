@@ -19,23 +19,20 @@ flowchart LR
     modelDeployment{Model Deployment}
     %% model testing
     modelTesting{Model Testing}
-    %% model config optimization
-    step3{Model Optimization}
     %% model Scaling
     modelScaling{Model Scaling}
     %% production optimization
-    step6{Model Productionalization}
+    modelProductionization{Model Productionization}
     multinodeDistributedInference{Multinode Distributed Inference}
 
-  modelDeployment-->modelTesting-->step3-->modelScaling-->step6
+  modelDeployment-->modelTesting-->modelScaling-->modelProductionization
   modelDeployment-->multinodeDistributedInference
   multinodeDistributedInference-->modelTesting
 
     click modelDeployment "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-identification.md"
     click modelTesting "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-testing.md"
-    click step3 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step3.md"
     click modelScaling "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-scaling.md"
-    click step6 "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step6.md"
+    click modelProductionization "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/step6.md"
     click multinodeDistributedInference "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/multinode-distributed-inference.md"
 ```
 
