@@ -15,20 +15,18 @@ techniques, and where to go next. We see a common journey most customers go thro
 
 ```mermaid
 flowchart LR
-    %% deploy model
+%% deploy model
     modelDeployment{Model Deployment}
-    %% model testing
+%% model testing
     modelTesting{Model Testing}
-    %% model Scaling
+%% model Scaling
     modelScaling{Model Scaling}
-    %% production optimization
+%% production optimization
     modelProductionization{Model Productionization}
     multinodeDistributedInference{Multinode Distributed Inference}
-
-  modelDeployment-->modelTesting-->modelScaling-->modelProductionization
-  modelDeployment-->multinodeDistributedInference
-  multinodeDistributedInference-->modelTesting
-
+    modelDeployment --> modelTesting --> modelScaling --> modelProductionization
+    modelDeployment --> multinodeDistributedInference
+    multinodeDistributedInference --> modelTesting
     click modelDeployment "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-identification.md"
     click modelTesting "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-testing.md"
     click modelScaling "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/model-scaling.md"
@@ -36,15 +34,9 @@ flowchart LR
     click multinodeDistributedInference "https://awslabs.github.io/ai-on-eks/docs/category/inference-on-eks/ai/llm/multinode-distributed-inference.md"
 ```
 
-Inference on EKS is split into the following sections: ML inference and AI inference. Navigating the complexity of different use cases, model types, inference engine, framework, and accelerator can be
+Navigating the complexity of different use cases, model types, inference engine, framework, and accelerator can be
 really daunting. AI on EKS aims to aid in identifying the proper tool for the job, providing suggestions and
 alternatives, while providing you the techniques you need to apply it directly to your use case to test.
-
-## ML Inference
-
-ML Inference employs simpler algorithms such as decision trees, logistic regression, support vector machines (SVMs) and
-shallow neural networks. These networks tend to work very well on CPUs and smaller GPUs and do not require the
-processing power of modern, larger network architectures.
 
 ## AI Inference
 
