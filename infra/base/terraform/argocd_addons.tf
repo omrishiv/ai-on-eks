@@ -141,7 +141,7 @@ resource "kubectl_manifest" "nvidia_dynamo_platform_yaml" {
 
 # Langfuse
 resource "kubectl_manifest" "langfuse_yaml" {
-  count = var.enable_langfuse ? 1 : 0
+  count     = var.enable_langfuse ? 1 : 0
   yaml_body = file("${path.module}/argocd-addons/observability/langfuse/langfuse.yaml")
 
   depends_on = [
@@ -158,7 +158,7 @@ resource "random_bytes" "langfuse_secret" {
 }
 
 resource "kubectl_manifest" "langfuse_secret_yaml" {
-  count     = var.enable_langfuse ? 1 : 0
+  count = var.enable_langfuse ? 1 : 0
   yaml_body = templatefile("${path.module}/argocd-addons/observability/langfuse/langfuse-secret.yaml", {
     salt                = random_bytes.langfuse_secret[0].hex
     encryption-key      = random_bytes.langfuse_secret[1].hex
