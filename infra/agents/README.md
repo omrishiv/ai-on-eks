@@ -1,6 +1,6 @@
 # Agentic Community Reference Deployment
 
-This is infrastructure is an implementation of
+This infrastructure is an implementation of
 the [Agentic Community Reference Architecture](https://github.com/agentic-community/wg-operations/pull/1) for running
 Agentic AI workloads. It deploys an environment that supports continuously building, deploying, and evaluating agents
 using open source tools in a secure, scalable, and reliable manner.
