@@ -36,8 +36,8 @@ Follow the directions to [create an ACM certificate](https://docs.aws.amazon.com
 
 ## Deploy the Environment
 
-- `cd infra/agents/terraform`
-- Open `blueprints.tfvars`
+- `cd infra/agents`
+- Open `terraform/blueprints.tfvars`
 - Set `acm_certificate_domain` to the domain you will be using for the platform
 - Run `./install.sh`
 
