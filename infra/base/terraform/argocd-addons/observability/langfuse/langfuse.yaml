@@ -10,7 +10,7 @@ spec:
   source:
     chart: langfuse
     repoURL: https://langfuse.github.io/langfuse-k8s
-    targetRevision: "1.3.0"
+    targetRevision: "1.5.7"
     helm:
       values: |
         langfuse: 
