@@ -99,7 +99,7 @@ module "eks_blueprints_addons" {
   }
 
   enable_external_dns = var.enable_external_dns
-  external_dns_route53_zone_arns = ["arn:aws:route53:::hostedzone/${data.aws_route53_zone.hosted_zone_id.zone_id}"]
+  external_dns_route53_zone_arns = ["arn:aws:route53:::hostedzone/${data.aws_route53_zone.hosted_zone_id[0].zone_id}"]
 
   #---------------------------------------
   # Ingress Nginx Add-on
