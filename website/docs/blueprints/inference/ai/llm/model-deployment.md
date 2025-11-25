@@ -76,8 +76,7 @@ flowchart RL
 
 ### Architecture Decisions
 
-Model: [Llama 3.2-1B](https://huggingface.co/NousResearch/Llama-3.2-1B). Llama 3.2 1B is a very small open weights
-model.
+Model: [Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B). Qwen 3 1.7B is a very small open weights model.
 It supports text generation and is a capable first model for illustrating LLM capabilities.
 
 Inference Engine: [vLLM](https://github.com/vllm-project/vllm). vLLM is a popular, open source, inference engine that is
@@ -86,7 +85,7 @@ environment and supports [many models](https://docs.vllm.ai/en/latest/models/sup
 [multiple accelerators](https://docs.vllm.ai/en/latest/features/quantization/supported_hardware.html), making it a great
 way to quickly deploy your first model.
 
-Instance Type: g6.2xlarge. The `g6.2xlarge` instance has an Nvidia L4 accelerator with 24 GiB of video memory. The
+Instance Type: g6.2xlarge. The `g6.2xlarge` instance has an Nvidia L4 accelerator with 24 GiB of GPU memory. The
 instance has 8 vCPUs and 32 GiB of RAM. For the most current pricing, please
 see [here](https://aws.amazon.com/ec2/pricing/on-demand/).
 
@@ -94,28 +93,41 @@ It is important to match the instance type to the model you would like to run. I
 that's ok, but you need to keep in mind the memory requirements of an LLM. A general equation is:
 
 $$
-Memory=\frac{(Parameters * 4Bytes)}{(32/Modelbits)} * 1.2\\\
+Memory=Parameters * \frac{Precision}{8} * Overhead\\\
 \text{Memory = Number of GiB required for Accelerator} \\\
 \text{Parameters = Number of parameters in model (e.g. 1B)} \\\
-\text{4Bytes = 4 Bytes} \\\
-\text{32=32 bits in 4 bytes } \\\
-\text{Modelbits=How many bits the model is using } \\\
-\text{1.2=20\% overhead for activations }
+\text{Precision=How many bits the model is using } \\\
+\text{Overhead=% overhead for activations }
 $$
 
 https://blog.eleuther.ai/transformer-math/
 
-Let's take the Llama 3.2-1B
-example ([bf16](https://huggingface.co/NousResearch/Llama-3.2-1B/blob/main/config.json#L31)):
+Let's take the Qwen3-1.7B
+example ([bf16](https://huggingface.co/Qwen/Qwen3-1.7B/blob/main/config.json#L25)):
 $$
-Memory=\frac{(Parameters * 4Bytes)}{(32/Modelbits)} * 1.2\\\
+Memory=Parameters * \frac{Precision}{8} * 1.2\\\
 \\\
-Memory=\frac{(1B * 4Bytes)}{(32/16)} * 1.2\\\
+Memory=1.7B * \frac{16}{8} * Overhead\\\
 \\\
-Memory=~2.4 GiB
+Memory=3.4 GiB * Overhead
 $$
 
-The `g6.2xlarge` has 24 GiB of video memory, which is more than 2.4 GiB, so the model will fit with room to spare.
+Overhead accounts for the components of the model above the static
+memory (https://tensorwave.com/blog/estimating-llm-inference-memory-requirements). These include activation memory and
+KV Cache. Activation memory is estimated at about 25% of the static memory. In the Qwen 3 example, we'd need to budget
+another 0.85 GiB.
+
+Finally, the KV cache is the largest portion of the dynamic memory. The KV Cache per token calculation is:
+KV Cache per Token = 2 * Precision * Layers * Hidden Dimension
+KV Cache per Token = 2 * 2 Bytes * 28 * 2048 = 0.2 MB per token
+
+But we need to look at the total KV cache, which is:
+Total KV Cache = KV Cache per Token * Context Length * Concurrent Requests
+Total KV Cache = 0.2 * 8192 * 1 = 1.6GiB
+
+Total Required memory for 1 concurrent request at 8192 context length = 3.4 GiB + 0.85 Gib + 1.6 Gib = 5.85 Gib
+
+The `g6.2xlarge` has 24 GiB of GPU memory, which is more than 5.85 GiB, so the model will fit with room to spare.
 
 ## Deployment
 
@@ -125,16 +137,18 @@ supports deployments using multiple frameworks and accelerators.
 
 ### Inference Charts
 
-This architecture is available in the AI on EKS [inference charts](../../inference-charts.md). Before deploying the
-chart, you will need to create a Hugging Face token and add it to your environment. You can follow the instructions
-at  [inference charts](../../inference-charts.md#1-create-hugging-face-token-secret) to create your token.
-
-You will also need to make sure you request access to the [Llama 3.2-1B](https://huggingface.co/meta-llama/Llama-3.2-1B)
-model. You will see a link at the top where you can request access. After it is granted, you can run the following:
+This architecture is available in the AI on
+EKS [inference charts](https://github.com/awslabs/ai-on-eks-charts/blob/main/charts/inference-charts/README.md). Before
+deploying the chart, you will need to create a Hugging Face token and add it to your environment. You can follow the
+instructions
+at  [inference charts](https://github.com/awslabs/ai-on-eks-charts/blob/main/charts/inference-charts/README.md#create-hugging-face-token-secret)
+to create your token.
 
 ```bash
-cd blueprints/inference/inference-charts
-helm template . --values values-llama-32-1b-vllm.yaml | kubectl apply -f -
+helm repo add ai-on-eks https://awslabs.github.io/ai-on-eks-charts/
+helm repo update
+
+helm template ai-on-eks/inference-charts --values https://raw.githubusercontent.com/awslabs/ai-on-eks-charts/refs/heads/main/charts/inference-charts/values-qwen3-1.7b-vllm.yaml | kubectl apply -f -
 ```
 
 This will deploy the vLLM container, which will pull the weights from Hugging Face and load the model.
@@ -147,13 +161,13 @@ You will want to make sure your container is running with:
 kubectl get po
 
 NAME                                READY   STATUS              RESTARTS   AGE
-llama-32-1b-vllm-5ffdcdddcf-gzwnn   0/1     Running             0          2m
+qwen3-1-7b-vllm-5ffdcdddcf-gzwnn   0/1     Running             0          2m
 ```
 
 Once the container is running, you can get the logs on it with
 
 ```bash
-kubectl logs -l app.kubernetes.io/component=llama-32-1b-vllm -f
+kubectl logs -l app.kubernetes.io/component=qwen-3-1-7b-vllm -f
 ```
 
 You will see some output, when you see
@@ -169,17 +183,22 @@ the server is running. Press `ctrl + c` to stop following the logs.
 You can now port-forward the endpoint to your local computer:
 
 ```bash
-kubectl port-forward svc/llama-32-1b-vllm 8000
+kubectl port-forward svc/qwen3-1-7b-vllm 8000
 ```
 
 In another terminal window, you can now send a request to the model:
 
 ```bash
-curl --location 'http://localhost:8000/v1/completions' \
+curl --location 'http://localhost:8000/v1/chat/completions' \
 --header 'Content-Type: application/json' \
 --data '{
-    "model": "NousResearch/Llama-3.2-1B",
-    "prompt": "Once upon a time, there was a programmer."
+    "model": "Qwen/Qwen3-1.7B",
+    "messages": [
+        {
+            "role": "user",
+            "content": "What is the capital of France?"
+        }
+    ]
 }'
 ```
 
@@ -187,31 +206,44 @@ And you should get a response back:
 
 ```bash
 {
-    "id": "cmpl-ce19e1491f0f4d2ea35ad5d03397e168",
-    "object": "text_completion",
-    "created": 1755663702,
-    "model": "NousResearch/Llama-3.2-1B",
+    "id": "chatcmpl-74996da47bab483da2108db7928a0bf4",
+    "object": "chat.completion",
+    "created": 1764102959,
+    "model": "Qwen/Qwen3-1.7B",
     "choices": [
         {
             "index": 0,
-            "text": " That programmer dreamed of creating a program that could do awesome things: analyse data,",
+            "message": {
+                "role": "assistant",
+                "content": "<think>\nOkay, the user is asking for the capital of France. Let me think. I know that France is a country in Europe, and I remember that Paris is the capital. But wait, I should double-check to make sure I'm not confusing it with another city. Let me recall... Yes, Paris is the capital. It's the largest city and has a lot of historical landmarks. I think it's also the cultural and economic center. I should confirm that there's no other city that's the capital. No, I'm pretty sure it's Paris. Maybe the user is testing if I know basic geography, so the answer is straightforward. I should just state it clearly and maybe add a bit about why it's the capital, like its history or significance. But the question is just asking for the name, so the answer is Paris. Let me make sure there's no confusion with other countries. For example, the capital of Germany is Berlin, and of Italy is Rome. So Paris is definitely the capital of France. Alright, I think that's solid.\n</think>\n\nThe capital of France is **Paris**. It is the largest city in the country, known for its iconic landmarks such as the Eiffel Tower, the Louvre Museum, and the Seine River. Paris serves as the political, cultural, and economic heart of France.",
+                "refusal": null,
+                "annotations": null,
+                "audio": null,
+                "function_call": null,
+                "tool_calls": [],
+                "reasoning_content": null
+            },
             "logprobs": null,
-            "finish_reason": "length",
+            "finish_reason": "stop",
             "stop_reason": null,
-            "prompt_logprobs": null
+            "token_ids": null
         }
     ],
+    "service_tier": null,
+    "system_fingerprint": null,
     "usage": {
-        "prompt_tokens": 11,
-        "total_tokens": 27,
-        "completion_tokens": 16,
+        "prompt_tokens": 15,
+        "total_tokens": 291,
+        "completion_tokens": 276,
         "prompt_tokens_details": null
     },
+    "prompt_logprobs": null,
+    "prompt_token_ids": null,
     "kv_transfer_params": null
 }
 ```
 
-> **Note:** You may have noticed the `/v1/completions` endpoint and are wondering when to use `/v1/completions` or
+> **Note:** You may have noticed the `/v1/chat/completions` endpoint and are wondering when to use `/v1/completions` or
 `/v1/chat/completions`. This space is constantly evolving and a great resource for knowing which endpoint to use for a
 > given model is Hugging Face. Under the "Use this model" button for the model card is a "vLLM" option which will show
 > you the correct endpoint.
@@ -223,14 +255,14 @@ When you are done using your model, you can remove it with:
 #### Option 1: Inference Charts
 
 ```bash
-helm template . --values values-llama-32-1b-vllm.yaml | kubectl delete -f -
+helm template ai-on-eks/inference-charts --values https://raw.githubusercontent.com/awslabs/ai-on-eks-charts/refs/heads/main/charts/inference-charts/values-qwen3-1.7b-vllm.yaml | kubectl delete -f -
 ```
 
 #### Option 2: Manual Removal
 
 ```bash
-kubectl delete deployment llama-32-1b-vllm
-kubectl delete service llama-32-1b-vllm
+kubectl delete deployment qwen3-1-7b-vllm
+kubectl delete service qwen3-1-7b-vllm
 ```
 
 ### Summary and Next Steps
