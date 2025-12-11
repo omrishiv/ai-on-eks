@@ -151,6 +151,11 @@ variable "enable_ai_ml_observability_stack" {
   type        = bool
   default     = false
 }
+variable "enable_external_dns" {
+  description = "Enable External DNS"
+  type        = bool
+  default     = false
+}
 variable "enable_argo_workflows" {
   description = "Enable Argo Workflows addon"
   type        = bool
@@ -335,6 +340,34 @@ variable "enable_cert_manager" {
 # Slinky Slurm Operator
 variable "enable_slurm_operator" {
   description = "Enable slurm-operator addon"
+  type        = bool
+  default     = false
+}
+
+# Langfuse
+variable "enable_langfuse" {
+  description = "Enable langfuse addon"
+  type        = bool
+  default     = false
+}
+
+# Gitlab
+variable "enable_gitlab" {
+  description = "Enable gitlab addon"
+  type        = bool
+  default     = false
+}
+
+# Milvus
+variable "enable_milvus" {
+  description = "Enable Milvus addon"
+  type        = bool
+  default     = false
+}
+
+# MCP Gateway Registry
+variable "enable_mcp_gateway_registry" {
+  description = "Enable MCP Gateway Registry addon"
   type        = bool
   default     = false
 }
